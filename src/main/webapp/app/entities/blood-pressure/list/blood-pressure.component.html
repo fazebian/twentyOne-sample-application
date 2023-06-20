@@ -1,0 +1,116 @@
+<div>
+  <h2 id="page-heading" data-cy="BloodPressureHeading">
+    <span jhiTranslate="twentyOneApp.bloodPressure.home.title">BloodPressures</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="twentyOneApp.bloodPressure.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-blood-pressure"
+        [routerLink]="['/blood-pressure/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="twentyOneApp.bloodPressure.home.createLabel"> Créer un nouveau Blood Pressure </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="bloodPressures?.length === 0">
+    <span jhiTranslate="twentyOneApp.bloodPressure.home.notFound">Aucun Blood Pressure trouvé</span>
+  </div>
+
+  <div class="table-responsive table-entities" id="entities" *ngIf="bloodPressures && bloodPressures.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+          <th scope="col" jhiSortBy="id">
+            <div class="d-flex">
+              <span jhiTranslate="global.field.id">ID</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="timestamp">
+            <div class="d-flex">
+              <span jhiTranslate="twentyOneApp.bloodPressure.timestamp">Timestamp</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="systolic">
+            <div class="d-flex">
+              <span jhiTranslate="twentyOneApp.bloodPressure.systolic">Systolic</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="diastolic">
+            <div class="d-flex">
+              <span jhiTranslate="twentyOneApp.bloodPressure.diastolic">Diastolic</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="user.login">
+            <div class="d-flex">
+              <span jhiTranslate="twentyOneApp.bloodPressure.user">User</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody
+        infinite-scroll
+        (scrolled)="loadPage(page + 1)"
+        [infiniteScrollDisabled]="page - 1 >= links['last']"
+        [infiniteScrollDistance]="0"
+      >
+        <tr *ngFor="let bloodPressure of bloodPressures; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/blood-pressure', bloodPressure.id, 'view']">{{ bloodPressure.id }}</a>
+          </td>
+          <td>{{ bloodPressure.timestamp | formatMediumDatetime }}</td>
+          <td>{{ bloodPressure.systolic }}</td>
+          <td>{{ bloodPressure.diastolic }}</td>
+          <td>
+            {{ bloodPressure.user?.login }}
+          </td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/blood-pressure', bloodPressure.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/blood-pressure', bloodPressure.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+              </button>
+
+              <button type="submit" (click)="delete(bloodPressure)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
